@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# personal-telegram
 
-## Getting Started
+One **personal** Telegram bot for you—not Jarvis driver dispatch, not HR PTO groups.
 
-First, run the development server:
+## What exists today (elsewhere)
+
+| System | Bot role |
+|--------|-----------|
+| **provision-admin** | `TELEGRAM_*` fleet alerts → your ops chat |
+| **heys3xy** | Same tokens today; contact form → Telegram |
+| **Jarvis** | `hr_telegram_settings`, `@velocity_dispatch_bot`, `TELEGRAM_ERROR_*`, daily digest via `user_telegram_links` |
+| **OpenClaw** | Separate Telegram → Cursor agent ([docs in jarvis](https://github.com/draydir/jarvis/blob/main/docs/setup/openclaw-telegram-cursor.md)) |
+
+This repo is the **hub** for a new `@…_bot` you own: inbound commands + a single authenticated HTTP API every small app can call.
+
+## Setup
+
+1. **BotFather** → `/newbot` → save token.
+2. Deploy to Vercel (team `drayage`, project `personal-telegram` or similar).
+3. Set env from `.env.example`.
+4. Register webhook:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+TELEGRAM_BOT_TOKEN=... \
+WEBHOOK_BASE_URL=https://your-deployment.vercel.app \
+TELEGRAM_WEBHOOK_SECRET=choose-a-long-random-string \
+node scripts/set-telegram-webhook.mjs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Message the bot **`/id`** → put `chat_id` in `TELEGRAM_DEFAULT_CHAT_ID` on Vercel.
+6. Set `TELEGRAM_ALLOWED_USER_IDS` to your Telegram user id (from `/id`) so strangers cannot use commands.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Notify from other apps
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+curl -sS -X POST "https://your-deployment.vercel.app/api/notify" \
+  -H "Authorization: Bearer $NOTIFY_API_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Hello from heys3xy","source":"heys3xy"}'
+```
 
-## Learn More
+Later: point **heys3xy** / **provision-admin** at this URL instead of embedding `TELEGRAM_BOT_TOKEN` in every project (one rotation point).
 
-To learn more about Next.js, take a look at the following resources:
+## Commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/start` `/help` `/ping` `/id`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Security
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Never commit tokens. Rotate if leaked in chat.
+- Always set `NOTIFY_API_SECRET` and `TELEGRAM_ALLOWED_USER_IDS` in production.
