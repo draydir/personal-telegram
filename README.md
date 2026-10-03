@@ -28,7 +28,7 @@ node scripts/set-telegram-webhook.mjs
 ```
 
 5. Message the bot **`/id`** → put `chat_id` in `TELEGRAM_DEFAULT_CHAT_ID` on Vercel.
-6. Lock commands: set `TELEGRAM_ALLOWED_USERNAMES=theBulgar82` or `TELEGRAM_ALLOWED_USER_IDS` from `/id`.
+6. Lock commands: `TELEGRAM_ALLOWED_USERNAMES=theBulgar82` and/or numeric `TELEGRAM_ALLOWED_USER_IDS` (from `/id` or `getChatAdministrators` on your notify chat).
 
 ## Notify from other apps
 
