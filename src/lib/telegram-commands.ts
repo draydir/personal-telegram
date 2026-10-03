@@ -41,7 +41,7 @@ export const handleTelegramUpdate = async (update: TelegramUpdate): Promise<void
   if (!message?.text || !message.from) return;
 
   const userId = message.from.id;
-  if (!isUserAllowed(userId)) {
+  if (!isUserAllowed(userId, message.from.username)) {
     await sendTelegramMessage(message.chat.id, "Unauthorized.");
     return;
   }

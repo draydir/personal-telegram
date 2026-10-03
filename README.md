@@ -28,7 +28,7 @@ node scripts/set-telegram-webhook.mjs
 ```
 
 5. Message the bot **`/id`** → put `chat_id` in `TELEGRAM_DEFAULT_CHAT_ID` on Vercel.
-6. Set `TELEGRAM_ALLOWED_USER_IDS` to your Telegram user id (from `/id`) so strangers cannot use commands.
+6. Lock commands: set `TELEGRAM_ALLOWED_USERNAMES=theBulgar82` or `TELEGRAM_ALLOWED_USER_IDS` from `/id`.
 
 ## Notify from other apps
 

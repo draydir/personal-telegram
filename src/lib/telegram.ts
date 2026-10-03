@@ -68,8 +68,33 @@ export const getAllowedUserIds = (): Set<number> => {
   );
 };
 
-export const isUserAllowed = (telegramUserId: number): boolean => {
-  const allowed = getAllowedUserIds();
-  if (allowed.size === 0) return true;
-  return allowed.has(telegramUserId);
+const normalizeUsername = (username: string): string =>
+  username.trim().replace(/^@/, "").toLowerCase();
+
+export const getAllowedUsernames = (): Set<string> => {
+  const raw = process.env.TELEGRAM_ALLOWED_USERNAMES?.trim();
+  if (!raw) return new Set();
+  return new Set(
+    raw
+      .split(",")
+      .map((s) => normalizeUsername(s))
+      .filter(Boolean),
+  );
+};
+
+export const isUserAllowed = (
+  telegramUserId: number,
+  username?: string | null,
+): boolean => {
+  const allowedIds = getAllowedUserIds();
+  const allowedNames = getAllowedUsernames();
+
+  if (allowedIds.size === 0 && allowedNames.size === 0) return true;
+
+  if (allowedIds.has(telegramUserId)) return true;
+
+  const normalized = username ? normalizeUsername(username) : "";
+  if (normalized && allowedNames.has(normalized)) return true;
+
+  return false;
 };
